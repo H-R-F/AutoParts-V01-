@@ -1,6 +1,7 @@
 /**
  * DEMO DATA — clearly labelled for development only.
  * This is not production data. All products, shops and prices are fictional.
+ * Images are from Unsplash (free to use) for demonstration purposes.
  */
 
 import type { Product, Shop, ProductCondition } from "./types";
@@ -79,7 +80,9 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     stock: 12,
     status: "active",
     shopId: "shop-1",
-    images: [],
+    images: [
+      "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=600&fit=crop",
+    ],
     isSponsored: true,
     compatibilitySource: "seller_provided",
     shopName: "Auto Pièces Casa",
@@ -101,7 +104,9 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     stock: 8,
     status: "active",
     shopId: "shop-2",
-    images: [],
+    images: [
+      "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=800&h=600&fit=crop",
+    ],
     isSponsored: false,
     compatibilitySource: "seller_provided",
     shopName: "Maghreb Motors Parts",
@@ -123,7 +128,9 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     stock: 4,
     status: "active",
     shopId: "shop-1",
-    images: [],
+    images: [
+      "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&h=600&fit=crop",
+    ],
     isSponsored: false,
     compatibilitySource: "seller_provided",
     shopName: "Auto Pièces Casa",
@@ -145,7 +152,9 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     stock: 20,
     status: "active",
     shopId: "shop-5",
-    images: [],
+    images: [
+      "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=600&fit=crop",
+    ],
     isSponsored: true,
     compatibilitySource: "seller_provided",
     shopName: "Tanger Spare Parts",
@@ -167,7 +176,9 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     stock: 2,
     status: "active",
     shopId: "shop-3",
-    images: [],
+    images: [
+      "https://images.unsplash.com/photo-1625047509168-a7026f36de04?w=800&h=600&fit=crop",
+    ],
     isSponsored: false,
     compatibilitySource: "seller_provided",
     shopName: "Pièces Express Fès",
@@ -189,7 +200,9 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     stock: 6,
     status: "active",
     shopId: "shop-2",
-    images: [],
+    images: [
+      "https://images.unsplash.com/photo-1487754180451-c456f719a1fc?w=800&h=600&fit=crop",
+    ],
     isSponsored: false,
     compatibilitySource: "seller_provided",
     shopName: "Maghreb Motors Parts",
@@ -211,7 +224,9 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     stock: 5,
     status: "active",
     shopId: "shop-4",
-    images: [],
+    images: [
+      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&h=600&fit=crop",
+    ],
     isSponsored: false,
     compatibilitySource: "seller_provided",
     shopName: "Atlas Auto Parts",
@@ -233,7 +248,9 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     stock: 15,
     status: "active",
     shopId: "shop-1",
-    images: [],
+    images: [
+      "https://images.unsplash.com/photo-1615906656593-a882066a8ffd?w=800&h=600&fit=crop",
+    ],
     isSponsored: false,
     compatibilitySource: "seller_provided",
     shopName: "Auto Pièces Casa",
@@ -255,7 +272,9 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     stock: 3,
     status: "active",
     shopId: "shop-5",
-    images: [],
+    images: [
+      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&h=600&fit=crop",
+    ],
     isSponsored: true,
     compatibilitySource: "seller_provided",
     shopName: "Tanger Spare Parts",
@@ -277,7 +296,9 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     stock: 7,
     status: "active",
     shopId: "shop-2",
-    images: [],
+    images: [
+      "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&h=600&fit=crop",
+    ],
     isSponsored: false,
     compatibilitySource: "seller_provided",
     shopName: "Maghreb Motors Parts",
@@ -298,7 +319,9 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     stock: 1,
     status: "active",
     shopId: "shop-3",
-    images: [],
+    images: [
+      "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&h=600&fit=crop",
+    ],
     isSponsored: false,
     compatibilitySource: "seller_provided",
     shopName: "Pièces Express Fès",
@@ -320,7 +343,9 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     stock: 9,
     status: "active",
     shopId: "shop-1",
-    images: [],
+    images: [
+      "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=800&h=600&fit=crop",
+    ],
     isSponsored: false,
     compatibilitySource: "seller_provided",
     shopName: "Auto Pièces Casa",
