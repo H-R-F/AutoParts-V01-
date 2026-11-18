@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { HomeSearch } from "@/components/search/HomeSearch";
 
 const CATEGORIES = [
   {
@@ -76,19 +77,19 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-r from-surface-900 via-surface-900/90 to-surface-900/40" />
         </div>
 
-        <div className="container-main relative py-20 sm:py-28 lg:py-32">
-          <div className="max-w-2xl">
+        <div className="container-main relative py-16 sm:py-24 lg:py-28">
+          <div className="max-w-3xl">
             <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl leading-tight">
               Trouvez vos pièces
               <span className="block text-brand-300">facilement au Maroc</span>
             </h1>
-            <p className="mt-6 text-lg leading-relaxed text-surface-300 max-w-xl">
-              Recherchez par référence, nom ou marque. Comparez les offres des
-              magasins locaux et contactez directement les vendeurs.
+            <p className="mt-5 text-lg leading-relaxed text-surface-300 max-w-xl">
+              Recherchez par nom, véhicule ou référence OEM. Comparez les offres
+              et contactez directement les vendeurs.
             </p>
 
             {/* Feature pills */}
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-wrap gap-3">
               {["Comparaison des magasins", "Contact direct", "Sans commission"].map(
                 (item) => (
                   <span
@@ -108,37 +109,9 @@ export default function HomePage() {
               )}
             </div>
 
-            {/* Search Box */}
-            <div className="mt-10">
-              <form
-                action="/search"
-                method="get"
-                className="flex flex-col sm:flex-row gap-3 p-2 rounded-2xl bg-white shadow-2xl"
-              >
-                <div className="relative flex-1">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                    <svg className="h-5 w-5 text-surface-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                    </svg>
-                  </div>
-                  <input
-                    type="search"
-                    name="q"
-                    placeholder="Référence OEM, nom de pièce, marque..."
-                    className="w-full rounded-xl border-0 py-3.5 pl-12 pr-4 text-surface-900 placeholder:text-surface-400 focus:ring-0 sm:text-base"
-                    aria-label="Rechercher une pièce"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="rounded-xl bg-brand-600 px-8 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
-                >
-                  Rechercher
-                </button>
-              </form>
-              <p className="mt-3 text-sm text-surface-400">
-                Exemples : filtre à huile, plaquettes frein, alternateur, 1KD-FTV...
-              </p>
+            {/* Multi-mode Search */}
+            <div className="mt-8">
+              <HomeSearch />
             </div>
           </div>
         </div>
@@ -225,7 +198,7 @@ export default function HomePage() {
             {
               step: "1",
               title: "Recherchez",
-              desc: "Par référence OEM, nom de pièce, marque ou catégorie.",
+              desc: "Par nom de pièce, véhicule ou référence OEM.",
             },
             {
               step: "2",
