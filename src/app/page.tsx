@@ -84,7 +84,7 @@ export default function HomePage() {
               <span className="block text-brand-300">facilement au Maroc</span>
             </h1>
             <p className="mt-5 text-lg leading-relaxed text-surface-300 max-w-xl">
-              Recherchez par nom, véhicule ou référence OEM. Comparez les offres
+              Recherchez par nom, véhicule, référence OEM ou photo. Comparez les offres
               et contactez directement les vendeurs.
             </p>
 
@@ -198,7 +198,7 @@ export default function HomePage() {
             {
               step: "1",
               title: "Recherchez",
-              desc: "Par nom de pièce, véhicule ou référence OEM.",
+              desc: "Par nom de pièce, véhicule, référence OEM ou photo.",
             },
             {
               step: "2",

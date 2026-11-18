@@ -1,10 +1,36 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { VEHICLE_MANUFACTURERS, MOROCCAN_CITIES } from "@/lib/vehicle-data";
+import {
+  IMAGE_SEARCH_ACCEPTED_TYPES,
+  IMAGE_SEARCH_MAX_PICK_BYTES,
+  IMAGE_SEARCH_MAX_UPLOAD_BYTES,
+  isAcceptedImageType,
+  resizeImageForSearch,
+  type ImageSearchError,
+  type ImageSearchResult,
+} from "@/lib/image-search";
 
-type SearchMode = "part" | "vehicle" | "oem";
+export type SearchMode = "part" | "vehicle" | "oem" | "image";
+
+export interface HomeSearchInitial {
+  q?: string;
+  city?: string;
+  type?: string;
+  make?: string;
+  model?: string;
+  year?: string;
+  engine?: string;
+}
+
+interface HomeSearchProps {
+  /** "hero" = dark homepage hero, "page" = light background (search page). */
+  variant?: "hero" | "page";
+  /** Values coming from the URL, used to pre-fill the form on the search page. */
+  initial?: HomeSearchInitial;
+}
 
 const MODES: { id: SearchMode; label: string; description: string }[] = [
   {
@@ -22,20 +48,51 @@ const MODES: { id: SearchMode; label: string; description: string }[] = [
     label: "OEM / Référence",
     description: "Numéro de référence exact",
   },
+  {
+    id: "image",
+    label: "Par photo",
+    description: "Envoyez une photo de la pièce, nous l’identifions pour vous",
+  },
 ];
 
-export function HomeSearch() {
+function getInitialMode(initial?: HomeSearchInitial): SearchMode {
+  if (initial?.make) return "vehicle";
+  if (initial?.type === "oem") return "oem";
+  return "part";
+}
+
+export function HomeSearch({ variant = "hero", initial }: HomeSearchProps) {
   const router = useRouter();
-  const [mode, setMode] = useState<SearchMode>("part");
-  const [query, setQuery] = useState("");
-  const [city, setCity] = useState("Tout le Maroc");
+  const isHero = variant === "hero";
+  const [mode, setMode] = useState<SearchMode>(getInitialMode(initial));
+  const [query, setQuery] = useState(
+    initial?.make ? "" : initial?.q ?? ""
+  );
+  const [city, setCity] = useState(initial?.city || "Tout le Maroc");
 
   // Vehicle selector state
-  const [manufacturer, setManufacturer] = useState("");
-  const [model, setModel] = useState("");
-  const [year, setYear] = useState("");
-  const [engine, setEngine] = useState("");
-  const [vehiclePart, setVehiclePart] = useState("");
+  const [manufacturer, setManufacturer] = useState(initial?.make ?? "");
+  const [model, setModel] = useState(initial?.model ?? "");
+  const [year, setYear] = useState(initial?.year ?? "");
+  const [engine, setEngine] = useState(initial?.engine ?? "");
+  const [vehiclePart, setVehiclePart] = useState(
+    initial?.make ? initial?.q ?? "" : ""
+  );
+
+  // Image search state
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [imageLoading, setImageLoading] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+
+  // Free the preview object URL when it changes or on unmount
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
 
   const selectedManufacturer = useMemo(
     () => VEHICLE_MANUFACTURERS.find((m) => m.name === manufacturer),
@@ -91,8 +148,76 @@ export function HomeSearch() {
     return qs ? `/search?${qs}` : "/search";
   };
 
+  const selectImage = (file: File | undefined | null) => {
+    if (!file) return;
+    setImageError(null);
+
+    if (!isAcceptedImageType(file.type)) {
+      setImageError("Format non supporté. Utilisez une image JPG, PNG ou WebP.");
+      return;
+    }
+    if (file.size > IMAGE_SEARCH_MAX_PICK_BYTES) {
+      setImageError("Image trop volumineuse (15 Mo maximum).");
+      return;
+    }
+
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const clearImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    setImageError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const submitImageSearch = async () => {
+    if (!imageFile || imageLoading) return;
+    setImageError(null);
+    setImageLoading(true);
+
+    try {
+      const resized = await resizeImageForSearch(imageFile);
+      if (resized.size > IMAGE_SEARCH_MAX_UPLOAD_BYTES) {
+        setImageError("Image trop volumineuse. Essayez une photo plus petite.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("image", resized, "part.jpg");
+
+      const res = await fetch("/api/image-search", {
+        method: "POST",
+        body: formData,
+      });
+      const data = (await res.json()) as ImageSearchResult | ImageSearchError;
+
+      if (!res.ok || !("query" in data)) {
+        setImageError(
+          "error" in data
+            ? data.error
+            : "L’analyse de l’image a échoué. Réessayez."
+        );
+        return;
+      }
+
+      const params = new URLSearchParams({ q: data.query, via: "image" });
+      if (city && city !== "Tout le Maroc") params.set("city", city);
+      router.push(`/search?${params.toString()}`);
+    } catch {
+      setImageError("Connexion impossible. Vérifiez votre réseau et réessayez.");
+    } finally {
+      setImageLoading(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (mode === "image") {
+      void submitImageSearch();
+      return;
+    }
     router.push(buildSearchUrl());
   };
 
@@ -101,10 +226,12 @@ export function HomeSearch() {
       ? query.trim().length > 0
       : mode === "oem"
       ? query.trim().length > 0
+      : mode === "image"
+      ? imageFile !== null && !imageLoading
       : manufacturer.length > 0; // vehicle mode can search with just a vehicle selected
 
   return (
-    <div className="w-full max-w-3xl">
+    <div className={`w-full ${isHero ? "max-w-3xl" : ""}`}>
       {/* Mode tabs */}
       <div className="flex flex-wrap gap-2 mb-4">
         {MODES.map((m) => (
@@ -113,9 +240,13 @@ export function HomeSearch() {
             type="button"
             onClick={() => setMode(m.id)}
             className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-              mode === m.id
-                ? "bg-white text-surface-900 shadow-md"
-                : "bg-white/10 text-white/80 hover:bg-white/20 hover:text-white"
+              isHero
+                ? mode === m.id
+                  ? "bg-white text-surface-900 shadow-md"
+                  : "bg-white/10 text-white/80 hover:bg-white/20 hover:text-white"
+                : mode === m.id
+                ? "bg-brand-600 text-white shadow-sm"
+                : "bg-surface-100 text-surface-700 hover:bg-surface-200"
             }`}
           >
             {m.label}
@@ -126,7 +257,9 @@ export function HomeSearch() {
       {/* Search card */}
       <form
         onSubmit={handleSubmit}
-        className="rounded-2xl bg-white p-4 sm:p-5 shadow-2xl"
+        className={`rounded-2xl bg-white p-4 sm:p-5 ${
+          isHero ? "shadow-2xl" : "border border-surface-200 shadow-card"
+        }`}
       >
         {/* Mode description */}
         <p className="mb-4 text-sm text-surface-500">
@@ -294,6 +427,100 @@ export function HomeSearch() {
           </div>
         )}
 
+        {/* === IMAGE MODE === */}
+        {mode === "image" && (
+          <div className="space-y-3">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={IMAGE_SEARCH_ACCEPTED_TYPES.join(",")}
+              onChange={(e) => selectImage(e.target.files?.[0])}
+              className="sr-only"
+              aria-label="Choisir une photo de la pièce"
+              tabIndex={-1}
+            />
+
+            {imagePreview ? (
+              <div className="flex items-center gap-4 rounded-xl border border-surface-200 p-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={imagePreview}
+                  alt="Aperçu de la pièce"
+                  className="h-24 w-24 shrink-0 rounded-lg object-cover"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-surface-900">
+                    {imageFile?.name}
+                  </p>
+                  <p className="text-xs text-surface-500">
+                    {imageFile ? `${(imageFile.size / 1024 / 1024).toFixed(1)} Mo` : ""}
+                  </p>
+                  <div className="mt-2 flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={imageLoading}
+                      className="text-sm font-medium text-brand-600 hover:text-brand-700 disabled:opacity-50"
+                    >
+                      Changer
+                    </button>
+                    <button
+                      type="button"
+                      onClick={clearImage}
+                      disabled={imageLoading}
+                      className="text-sm font-medium text-surface-500 hover:text-surface-700 disabled:opacity-50"
+                    >
+                      Retirer
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragActive(true);
+                }}
+                onDragLeave={() => setDragActive(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDragActive(false);
+                  selectImage(e.dataTransfer.files?.[0]);
+                }}
+                className={`flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-8 text-center transition ${
+                  dragActive
+                    ? "border-brand-500 bg-brand-50"
+                    : "border-surface-300 hover:border-brand-400 hover:bg-surface-50"
+                }`}
+              >
+                <svg className="h-8 w-8 text-surface-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+                </svg>
+                <span className="text-sm font-medium text-surface-700">
+                  Prenez ou choisissez une photo
+                </span>
+                <span className="text-xs text-surface-500">
+                  JPG, PNG ou WebP · glissez-déposez possible
+                </span>
+              </button>
+            )}
+
+            {imageError && (
+              <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+                {imageError}
+              </p>
+            )}
+
+            <p className="text-xs text-surface-500">
+              Photo nette, pièce bien cadrée. L’identification est une aide à la recherche :
+              confirmez toujours la référence et la compatibilité avec le vendeur.
+            </p>
+          </div>
+        )}
+
         {/* Location + Submit */}
         <div className="mt-4 flex flex-col sm:flex-row gap-3">
           <div className="sm:w-48">
@@ -312,13 +539,13 @@ export function HomeSearch() {
 
           <button
             type="submit"
-            disabled={!canSearch && mode !== "vehicle"}
+            disabled={mode === "vehicle" ? false : !canSearch}
             className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-6 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
-            Rechercher
+            {imageLoading ? "Analyse de la photo..." : mode === "image" ? "Rechercher par photo" : "Rechercher"}
           </button>
         </div>
       </form>
