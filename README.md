@@ -76,6 +76,20 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
+## Search Modes
+
+The same `HomeSearch` component is used on the homepage and the search page:
+
+- **Nom de pièce** – free text
+- **Par véhicule** – make / model / year / engine
+- **OEM / Référence** – exact reference number
+- **Par photo** – upload a photo of the part; `/api/image-search` identifies it and redirects to `/search?q=…&via=image`
+
+Image search needs a server-side key. Copy `.env.example` to `.env.local` and set `ANTHROPIC_API_KEY`.
+Photos are resized in the browser (max 1280 px) and are not stored.
+
+---
+
 ## Important Notes
 
 - This is currently a **frontend foundation**. Backend, real authentication, persistent database and production security are not yet implemented.

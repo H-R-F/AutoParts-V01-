@@ -3,6 +3,7 @@ import Link from "next/link";
 import { DEMO_PRODUCTS } from "@/lib/demo-data";
 import { ProductCard } from "@/components/search/ProductCard";
 import { SearchFilters } from "@/components/search/SearchFilters";
+import { HomeSearch } from "@/components/search/HomeSearch";
 import { SearchPageClient } from "./SearchPageClient";
 
 interface SearchPageProps {
@@ -70,31 +71,37 @@ function filterProducts(params: { [key: string]: string | string[] | undefined }
   return results;
 }
 
+function firstParam(value: string | string[] | undefined): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
+
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const q = typeof params.q === "string" ? params.q : "";
+  const fromImage = params.via === "image";
   const products = filterProducts(params);
+
+  // Same search as the homepage, pre-filled from the URL.
+  const initial = {
+    q: firstParam(params.q),
+    city: firstParam(params.city),
+    type: firstParam(params.type),
+    make: firstParam(params.make),
+    model: firstParam(params.model),
+    year: firstParam(params.year),
+    engine: firstParam(params.engine),
+  };
 
   return (
     <div className="bg-surface-50 min-h-screen">
-      {/* Search bar */}
-      <div className="border-b border-surface-200 bg-white sticky top-16 z-40">
-        <div className="container-main py-4">
-          <form action="/search" method="get" className="flex gap-3">
-            <div className="relative flex-1">
-              <input
-                type="search"
-                name="q"
-                defaultValue={q}
-                placeholder="Référence OEM, nom de pièce, marque..."
-                className="input-field py-3 pl-4 pr-4 text-base"
-                aria-label="Rechercher une pièce"
-              />
-            </div>
-            <button type="submit" className="btn-primary px-6">
-              Rechercher
-            </button>
-          </form>
+      {/* Search (same component as the homepage) */}
+      <div className="border-b border-surface-200 bg-white">
+        <div className="container-main py-5">
+          <HomeSearch
+            key={JSON.stringify(initial)}
+            variant="page"
+            initial={initial}
+          />
         </div>
       </div>
 
@@ -102,7 +109,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Desktop Filters */}
           <aside className="hidden lg:block w-64 shrink-0">
-            <div className="card p-5 sticky top-36">
+            <div className="card p-5 sticky top-24">
               <Suspense fallback={<div className="animate-pulse h-64 bg-surface-100 rounded" />}>
                 <SearchFilters />
               </Suspense>
@@ -138,6 +145,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 </Suspense>
               </div>
             </div>
+
+            {fromImage && q && (
+              <div className="mb-6 rounded-xl bg-brand-50 border border-brand-200 px-4 py-3 text-sm text-brand-900">
+                <strong>Recherche par photo.</strong> Pièce identifiée : « {q} ».
+                Cette identification est indicative — vérifiez la référence et la
+                compatibilité avec le vendeur.
+              </div>
+            )}
 
             {/* Demo notice */}
             <div className="mb-6 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
