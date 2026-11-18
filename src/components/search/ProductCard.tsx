@@ -5,9 +5,19 @@ import { CONDITION_LABELS } from "@/lib/demo-data";
 
 interface ProductCardProps {
   product: DemoProduct;
+  /** Show the publication date (used by the "recently added" section). */
+  showListingDate?: boolean;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, showListingDate = false }: ProductCardProps) {
+  const listingDate =
+    showListingDate && product.createdAt
+      ? new Date(product.createdAt).toLocaleDateString("fr-MA", {
+          day: "numeric",
+          month: "short",
+        })
+      : null;
+
   const whatsappLink = product.shopWhatsapp
     ? `https://wa.me/${product.shopWhatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(
         `Bonjour, je suis intéressé par : ${product.name}${product.oemReference ? ` (réf. ${product.oemReference})` : ""}`
@@ -99,6 +109,11 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.price.toLocaleString("fr-MA")}
           </span>
           <span className="text-sm font-medium text-surface-500">DH</span>
+          {listingDate && (
+            <span className="ml-auto text-xs text-surface-500">
+              Ajouté le {listingDate}
+            </span>
+          )}
         </div>
 
         {/* Shop info */}

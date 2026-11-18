@@ -3,6 +3,7 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { VEHICLE_MANUFACTURERS, MOROCCAN_CITIES } from "@/lib/vehicle-data";
+import { useSelectedCity } from "@/lib/use-city";
 import {
   IMAGE_SEARCH_ACCEPTED_TYPES,
   IMAGE_SEARCH_MAX_PICK_BYTES,
@@ -68,7 +69,16 @@ export function HomeSearch({ variant = "hero", initial }: HomeSearchProps) {
   const [query, setQuery] = useState(
     initial?.make ? "" : initial?.q ?? ""
   );
-  const [city, setCity] = useState(initial?.city || "Tout le Maroc");
+  // City follows the header selector unless the URL already specifies one.
+  const [globalCity, setGlobalCity] = useSelectedCity();
+  const [cityOverride, setCityOverride] = useState<string | null>(
+    initial?.city || null
+  );
+  const city = cityOverride ?? globalCity;
+  const setCity = (value: string) => {
+    setCityOverride(value);
+    setGlobalCity(value);
+  };
 
   // Vehicle selector state
   const [manufacturer, setManufacturer] = useState(initial?.make ?? "");
@@ -279,7 +289,7 @@ export function HomeSearch({ variant = "hero", initial }: HomeSearchProps) {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Ex: filtre à huile, plaquettes frein, alternateur..."
+                placeholder="Quelle pièce cherchez-vous ? Ex : plaquettes de frein"
                 className="w-full rounded-xl border border-surface-200 py-3.5 pl-11 pr-4 text-surface-900 placeholder:text-surface-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 autoComplete="off"
               />

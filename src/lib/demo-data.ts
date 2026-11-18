@@ -69,6 +69,7 @@ export interface DemoProduct extends Product {
 export const DEMO_PRODUCTS: DemoProduct[] = [
   {
     id: "prod-1",
+    createdAt: "2026-11-17T09:00:00.000Z",
     name: "Filtre à huile moteur",
     brand: "Bosch",
     category: "Filtration",
@@ -94,6 +95,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
   },
   {
     id: "prod-2",
+    createdAt: "2026-11-16T09:00:00.000Z",
     name: "Plaquettes de frein avant",
     brand: "Brembo",
     category: "Freinage",
@@ -118,6 +120,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
   },
   {
     id: "prod-3",
+    createdAt: "2026-11-15T09:00:00.000Z",
     name: "Amortisseur avant gauche",
     brand: "Monroe",
     category: "Suspension",
@@ -142,6 +145,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
   },
   {
     id: "prod-4",
+    createdAt: "2026-11-14T09:00:00.000Z",
     name: "Filtre à air",
     brand: "Mann-Filter",
     category: "Filtration",
@@ -166,6 +170,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
   },
   {
     id: "prod-5",
+    createdAt: "2026-11-13T09:00:00.000Z",
     name: "Alternateur reconditionné",
     brand: "Valeo",
     category: "Électrique",
@@ -190,6 +195,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
   },
   {
     id: "prod-6",
+    createdAt: "2026-11-12T09:00:00.000Z",
     name: "Disque de frein avant",
     brand: "TRW",
     category: "Freinage",
@@ -214,6 +220,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
   },
   {
     id: "prod-7",
+    createdAt: "2026-11-11T09:00:00.000Z",
     name: "Pompe à eau",
     brand: "Gates",
     category: "Moteur",
@@ -238,6 +245,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
   },
   {
     id: "prod-8",
+    createdAt: "2026-11-10T09:00:00.000Z",
     name: "Filtre à carburant",
     brand: "Bosch",
     category: "Filtration",
@@ -262,6 +270,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
   },
   {
     id: "prod-9",
+    createdAt: "2026-11-09T09:00:00.000Z",
     name: "Kit d'embrayage",
     brand: "Luk",
     category: "Transmission",
@@ -286,6 +295,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
   },
   {
     id: "prod-10",
+    createdAt: "2026-11-08T09:00:00.000Z",
     name: "Batterie 70Ah",
     brand: "Varta",
     category: "Électrique",
@@ -310,6 +320,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
   },
   {
     id: "prod-11",
+    createdAt: "2026-11-07T09:00:00.000Z",
     name: "Rétroviseur droit (occasion)",
     brand: "OEM",
     category: "Carrosserie",
@@ -333,6 +344,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
   },
   {
     id: "prod-12",
+    createdAt: "2026-11-06T09:00:00.000Z",
     name: "Courroie de distribution",
     brand: "Gates",
     category: "Moteur",
