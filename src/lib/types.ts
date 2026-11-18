@@ -52,5 +52,7 @@ export interface Product {
   images: string[];
   description?: string;
   isSponsored?: boolean;
+  /** ISO publication timestamp, used for "recently added" ordering. */
+  createdAt?: string;
   compatibilitySource?: "seller_provided" | "verified" | "unknown";
 }
