@@ -73,7 +73,6 @@ function filterProducts(params: { [key: string]: string | string[] | undefined }
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const q = typeof params.q === "string" ? params.q : "";
-  const sort = typeof params.sort === "string" ? params.sort : "relevance";
   const products = filterProducts(params);
 
   return (
@@ -133,32 +132,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               </div>
 
               <div className="flex items-center gap-3">
-                {/* Mobile filters trigger */}
+                {/* Mobile filters + Sort handled in Client Component */}
                 <Suspense fallback={null}>
                   <SearchPageClient />
                 </Suspense>
-
-                {/* Sort */}
-                <form action="/search" method="get" className="flex items-center gap-2">
-                  {q && <input type="hidden" name="q" value={q} />}
-                  {/* Preserve other filters would need client, simplified here */}
-                  <label htmlFor="sort" className="text-sm text-surface-600 whitespace-nowrap">
-                    Trier par
-                  </label>
-                  <select
-                    id="sort"
-                    name="sort"
-                    defaultValue={sort}
-                    onChange={(e) => {
-                      // This is a server component limitation; we handle properly in client
-                    }}
-                    className="input-field py-2 text-sm w-auto"
-                  >
-                    <option value="relevance">Pertinence</option>
-                    <option value="price_asc">Prix croissant</option>
-                    <option value="price_desc">Prix décroissant</option>
-                  </select>
-                </form>
               </div>
             </div>
 
